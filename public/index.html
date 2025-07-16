@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>URL Shortener</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+  <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-4xl">
+    <h1 class="text-2xl font-bold mb-6 text-center">URL Shortener</h1>
+    
+    <!-- Create Short URL Section -->
+    <div class="mb-8 p-4 border rounded-lg">
+      <h2 class="text-lg font-semibold mb-4">Create Short URL</h2>
+      <form id="urlForm" class="space-y-4">
+        <input
+          type="text"
+          id="urlInput"
+          placeholder="Enter your URL"
+          class="w-full p-2 border rounded"
+        >
+        <button
+          type="submit"
+          class="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
+        >
+          Shorten URL
+        </button>
+      </form>
+      <div id="result" class="mt-4"></div>
+    </div>
+
+    <!-- Manage URLs Section -->
+    <div class="mb-8 p-4 border rounded-lg">
+      <h2 class="text-lg font-semibold mb-4">Manage URLs</h2>
+      
+      <!-- Retrieve URL -->
+      <div class="mb-4">
+        <h3 class="font-medium mb-2">Retrieve Original URL</h3>
+        <div class="flex space-x-2">
+          <input
+            type="text"
+            id="retrieveInput"
+            placeholder="Enter short code"
+            class="flex-1 p-2 border rounded"
+          >
+          <button
+            onclick="retrieveUrl()"
+            class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+          >
+            Retrieve
+          </button>
+        </div>
+        <div id="retrieveResult" class="mt-2"></div>
+      </div>
+
+      <!-- Update URL -->
+      <div class="mb-4">
+        <h3 class="font-medium mb-2">Update Short URL</h3>
+        <div class="space-y-2">
+          <input
+            type="text"
+            id="updateShortCode"
+            placeholder="Enter short code"
+            class="w-full p-2 border rounded"
+          >
+          <input
+            type="text"
+            id="updateUrl"
+            placeholder="Enter new URL"
+            class="w-full p-2 border rounded"
+          >
+          <button
+            onclick="updateUrl()"
+            class="w-full bg-yellow-500 text-white p-2 rounded hover:bg-yellow-600"
+          >
+            Update
+          </button>
+        </div>
+        <div id="updateResult" class="mt-2"></div>
+      </div>
+
+      <!-- Delete URL -->
+      <div class="mb-4">
+        <h3 class="font-medium mb-2">Delete Short URL</h3>
+        <div class="flex space-x-2">
+          <input
+            type="text"
+            id="deleteInput"
+            placeholder="Enter short code"
+            class="flex-1 p-2 border rounded"
+          >
+          <button
+            onclick="deleteUrl()"
+            class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+          >
+            Delete
+          </button>
+        </div>
+        <div id="deleteResult" class="mt-2"></div>
+      </div>
+
+      <!-- Get Statistics -->
+      <div class="mb-4">
+        <h3 class="font-medium mb-2">Get URL Statistics</h3>
+        <div class="flex space-x-2">
+          <input
+            type="text"
+            id="statsInput"
+            placeholder="Enter short code"
+            class="flex-1 p-2 border rounded"
+          >
+          <button
+            onclick="getStats()"
+            class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600"
+          >
+            Get Stats
+          </button>
+        </div>
+        <div id="statsResult" class="mt-2"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('urlForm');
+    const urlInput = document.getElementById('urlInput');
+    const resultDiv = document.getElementById('result');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const url = urlInput.value;
+
+      try {
+        const response = await fetch('/api/shorten', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url })
+        });
+
+        const data = await response.json();
+        
+        if (response.ok) {
+          const shortUrl = `${window.location.origin}/api/${data.shortCode}`;
+          resultDiv.innerHTML = `
+            <p class="text-green-600">Short URL created!</p>
+            <p>Short URL: <a href="${shortUrl}" class="text-blue-500 underline">${shortUrl}</a></p>
+            <p>Original URL: ${data.url}</p>
+            <p>Created: ${new Date(data.createdAt).toLocaleString()}</p>
+          `;
+        } else {
+          resultDiv.innerHTML = `<p class="text-red-600">${data.error}</p>`;
+        }
+      } catch (error) {
+        resultDiv.innerHTML = `<p class="text-red-600">Error: ${error.message}</p>`;
+      }
+
+      urlInput.value = '';
+    });
+
+    // Retrieve original URL
+    async function retrieveUrl() {
+      const shortCode = document.getElementById('retrieveInput').value;
+      const resultDiv = document.getElementById('retrieveResult');
+      
+      if (!shortCode) {
+        resultDiv.innerHTML = '<p class="text-red-600">Please enter a short code</p>';
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/shorten/${shortCode}`);
+        const data = await response.json();
+        
+        if (response.ok) {
+          resultDiv.innerHTML = `
+            <div class="p-3 bg-green-100 border border-green-300 rounded">
+              <p class="text-green-800"><strong>Original URL:</strong> ${data.url}</p>
+              <p class="text-green-800"><strong>Short Code:</strong> ${data.shortCode}</p>
+              <p class="text-green-800"><strong>Clicks:</strong> ${data.accessCount}</p>
+              <p class="text-green-800"><strong>Created:</strong> ${new Date(data.createdAt).toLocaleString()}</p>
+            </div>
+          `;
+        } else {
+          resultDiv.innerHTML = `<p class="text-red-600">${data.error}</p>`;
+        }
+      } catch (error) {
+        resultDiv.innerHTML = `<p class="text-red-600">Error: ${error.message}</p>`;
+      }
+    }
+
+    // Update URL
+    async function updateUrl() {
+      const shortCode = document.getElementById('updateShortCode').value;
+      const newUrl = document.getElementById('updateUrl').value;
+      const resultDiv = document.getElementById('updateResult');
+      
+      if (!shortCode || !newUrl) {
+        resultDiv.innerHTML = '<p class="text-red-600">Please enter both short code and new URL</p>';
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/shorten/${shortCode}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: newUrl })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          resultDiv.innerHTML = `
+            <div class="p-3 bg-yellow-100 border border-yellow-300 rounded">
+              <p class="text-yellow-800"><strong>URL Updated Successfully!</strong></p>
+              <p class="text-yellow-800"><strong>New URL:</strong> ${data.url}</p>
+              <p class="text-yellow-800"><strong>Short Code:</strong> ${data.shortCode}</p>
+              <p class="text-yellow-800"><strong>Updated:</strong> ${new Date(data.updatedAt).toLocaleString()}</p>
+            </div>
+          `;
+          document.getElementById('updateShortCode').value = '';
+          document.getElementById('updateUrl').value = '';
+        } else {
+          resultDiv.innerHTML = `<p class="text-red-600">${data.error}</p>`;
+        }
+      } catch (error) {
+        resultDiv.innerHTML = `<p class="text-red-600">Error: ${error.message}</p>`;
+      }
+    }
+
+    // Delete URL
+    async function deleteUrl() {
+      const shortCode = document.getElementById('deleteInput').value;
+      const resultDiv = document.getElementById('deleteResult');
+      
+      if (!shortCode) {
+        resultDiv.innerHTML = '<p class="text-red-600">Please enter a short code</p>';
+        return;
+      }
+
+      if (!confirm(`Are you sure you want to delete the short URL: ${shortCode}?`)) {
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/shorten/${shortCode}`, {
+          method: 'DELETE'
+        });
+        
+        if (response.ok) {
+          resultDiv.innerHTML = `
+            <div class="p-3 bg-red-100 border border-red-300 rounded">
+              <p class="text-red-800"><strong>URL Deleted Successfully!</strong></p>
+              <p class="text-red-800">Short code: ${shortCode}</p>
+            </div>
+          `;
+          document.getElementById('deleteInput').value = '';
+        } else {
+          const data = await response.json();
+          resultDiv.innerHTML = `<p class="text-red-600">${data.error}</p>`;
+        }
+      } catch (error) {
+        resultDiv.innerHTML = `<p class="text-red-600">Error: ${error.message}</p>`;
+      }
+    }
+
+    // Get Statistics
+    async function getStats() {
+      const shortCode = document.getElementById('statsInput').value;
+      const resultDiv = document.getElementById('statsResult');
+      
+      if (!shortCode) {
+        resultDiv.innerHTML = '<p class="text-red-600">Please enter a short code</p>';
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/stats/${shortCode}`);
+        const data = await response.json();
+        
+        if (response.ok) {
+          resultDiv.innerHTML = `
+            <div class="p-3 bg-purple-100 border border-purple-300 rounded">
+              <p class="text-purple-800"><strong>URL Statistics</strong></p>
+              <p class="text-purple-800"><strong>Original URL:</strong> ${data.url}</p>
+              <p class="text-purple-800"><strong>Short Code:</strong> ${data.shortCode}</p>
+              <p class="text-purple-800"><strong>Total Clicks:</strong> ${data.accessCount}</p>
+              <p class="text-purple-800"><strong>Created:</strong> ${new Date(data.createdAt).toLocaleString()}</p>
+              <p class="text-purple-800"><strong>Last Updated:</strong> ${new Date(data.updatedAt).toLocaleString()}</p>
+            </div>
+          `;
+        } else {
+          resultDiv.innerHTML = `<p class="text-red-600">${data.error}</p>`;
+        }
+      } catch (error) {
+        resultDiv.innerHTML = `<p class="text-red-600">Error: ${error.message}</p>`;
+      }
+    }
+  </script>
+</body>
+</html>

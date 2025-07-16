@@ -3,11 +3,12 @@
 A simple and clean RESTful API built using **Node.js**, **Express.js**, and **MySQL**. It allows users to shorten URLs, retrieve them, update/delete them, and view access statistics — with a responsive frontend using **Tailwind CSS**.
 
 <img width="526" height="229" alt="Backend" src="https://github.com/user-attachments/assets/b33ce3b6-c0a4-4b32-af35-eb0f43494e69" />
-<img width="526" height="229" alt="Backend" src="https://github.com/user-attachments/assets/a486c332-4ee2-4716-b45c-1d87d06d35f1" />
-<img width="526" height="229" alt="Backend" src="https://github.com/user-attachments/assets/deccda16-e946-40b0-8fa0-a181e9942c25" />
-<img width="526" height="229" alt="Backend" src="https://github.com/user-attachments/assets/b14f5fd2-9018-43e1-a0ba-82d9adf5d260" />
-<img width="526" height="229" alt="Backend" src="https://github.com/user-attachments/assets/51bd45a8-5f19-4905-8c22-61c395929339" />
-<img width="526" height="229" alt="Backend" src="https://github.com/user-attachments/assets/5411d40a-3c48-4022-8704-5d855625f866" />
+<img width="694" height="505" alt="Frontend" src="https://github.com/user-attachments/assets/536155b6-5f04-44db-a48a-4593e48d2442" />
+<img width="407" height="440" alt="workingfrontned" src="https://github.com/user-attachments/assets/9076c9c5-81d4-4683-8260-cca7d85be0ad" />
+<img width="389" height="402" alt="workingfrontend2" src="https://github.com/user-attachments/assets/53b0a6a8-12c3-4da0-a8cd-07979fd73a5d" />
+<img width="789" height="459" alt="sqldatabase" src="https://github.com/user-attachments/assets/40956afa-cf62-4467-9b6d-fa45c8c2d1c3" />
+<img width="629" height="216" alt="databse1" src="https://github.com/user-attachments/assets/b733c753-61da-4a32-8290-617173570283" />
+
 
 
 
